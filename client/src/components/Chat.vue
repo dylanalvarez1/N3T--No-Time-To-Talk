@@ -24,12 +24,13 @@
               </div>
           </div>
       </div>
+      <i>{{this.typemsg}}</i>
       <div class="input-area">
           <form @submit.prevent="sendMessage">
               <div class="message-input">
                   <!--hr v-if="messages[0] != null" -->
                   <label for="message">Message: </label>
-                  <input type="text" v-model="message" class="input">
+                  <input type="text" v-model="message" class="input" @input="typingHandler">
                   <input type="submit" class="submit-button" value="Send"/>
               </div>
 
@@ -48,7 +49,9 @@ export default {
           currentUser: '',
           message: '',
           messages: [],
-          socket : io('localhost:3001')
+          socket : io('localhost:3001'),
+          typemsg: "",
+          timer: null
       }
   },
   methods: {
@@ -60,7 +63,41 @@ export default {
               message: this.message,
               server: false
           });
+
+          this.socket.emit('TYPINGDONE', {
+          });
+
           this.message = ''
+      },
+      typingHandler() {
+        this.socket.emit('TYPING', {
+          user: this.currentUser
+        });
+
+        console.log("Typing event");
+
+        //Send a not typing message after 3 seconds of no keyboard activity
+        //if no timer, create one
+        if(this.timer == null) {
+            this.timer = setTimeout(() => {
+              this.socket.emit('TYPINGDONE', {
+            });
+            console.log("TIMER DONE");
+            console.log(this.timer);
+            this.timer = null;
+            console.log(this.timer);
+          }, 3000);
+        }
+        //if timer already, replace and reset it
+        else {
+          console.log("do nothing");
+          clearTimeout(this.timer);
+          this.timer = setTimeout(() => {
+              this.socket.emit('TYPINGDONE', {
+            });
+          }, 3000);
+        }
+
       }
   },
   mounted() {
@@ -83,6 +120,16 @@ export default {
         this.socket.on('ENTER_CHAT', (data) => {
           console.log("ENTER CHAT EVENT CLIENT, data: ", data.user);
           this.messages.push(data);
+        });
+
+        this.socket.on('TYPING', (data) => {
+          console.log("Typing event");
+          this.typemsg = data.user + " is typing a message...\n";
+        });
+
+        this.socket.on('TYPINGDONE', (data) => {
+          console.log("Done typing event");
+          this.typemsg = "";
         });
 
   }

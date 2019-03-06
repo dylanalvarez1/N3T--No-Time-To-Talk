@@ -17,5 +17,13 @@ io.on('connection', function(socket) {
     socket.on('ENTER_CHAT', function(data) {
         console.log("Connected user data: ", JSON.stringify(data));
         socket.broadcast.emit('ENTER_CHAT', data);
-    })
+    });
+    socket.on('TYPING', function(data) {
+        console.log("This user is typing: ", JSON.stringify(data));
+        socket.broadcast.emit('TYPING', data);
+    });
+    socket.on('TYPINGDONE', function(data) {
+        console.log("No more typing");
+        socket.broadcast.emit('TYPINGDONE', data);
+    });
 });
