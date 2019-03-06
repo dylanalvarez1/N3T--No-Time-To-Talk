@@ -13,6 +13,9 @@ io.on('connection', function(socket) {
         console.log("server send message");
         io.emit('MESSAGE', data);
         console.log("DATA:" + JSON.stringify(data));
-        
     });
+    socket.on('ENTER_CHAT', function(data) {
+        console.log("Connected user data: ", JSON.stringify(data));
+        socket.broadcast.emit('ENTER_CHAT', data);
+    })
 });
