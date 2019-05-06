@@ -1,6 +1,7 @@
 # N3T - No Time To Talk
 
 A simple chat app utilizing Vue, Express, and Socket.io
+
 Create temporary chat rooms and chat with friends!
 
 ## Requirements & Getting Started
