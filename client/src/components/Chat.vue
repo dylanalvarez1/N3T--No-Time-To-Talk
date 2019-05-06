@@ -2,7 +2,10 @@
   <div class="card-container">
       <div class="card-header">
           <div class="card-title">
-              <h3>Chat Group</h3>
+              <span style="display: inline-block;">
+                <h3>Chat Group</h3>
+                <button v-if="users != null" style="float: right;" @click="showUsers">{{Object.keys(this.users).length}} </button>
+              </span>
               <hr>
           </div>
           <div class="message-area">
@@ -25,6 +28,7 @@
           </div>
       </div>
       <i>{{this.typemsg}}</i>
+      <br v-if="this.typemsg != ''"><br>
       <div class="input-area">
           <form @submit.prevent="sendMessage">
               <div class="message-input">
@@ -51,7 +55,8 @@ export default {
           messages: [],
           socket : io('localhost:3001'),
           typemsg: "",
-          timer: null
+          timer: null,
+          users: null
       }
   },
   methods: {
@@ -97,19 +102,21 @@ export default {
             });
           }, 3000);
         }
-
+      },
+      showUsers() {
+        if(this.users != {}) {
+          let users = Object.keys(this.users);
+          console.log(users);
+        }
+        else {
+          console.log("no users");
+        }
       }
   },
   mounted() {
-        this.socket.on('MESSAGE', (data) => {
-          this.messages.push(data);
-          console.log(JSON.stringify(data));
-        });
-
-
 
         this.currentUser = this.user;
-        console.log("Just mounted");
+
         //Format the data so it can display correctly
         this.socket.emit('ENTER_CHAT', {
           user: this.currentUser,
@@ -117,21 +124,46 @@ export default {
           server: true
         });
 
+        //event for messaging
+        this.socket.on('MESSAGE', (data) => {
+          this.messages.push(data);
+          console.log(JSON.stringify(data));
+        });
+
+        //event when someone enters chat
         this.socket.on('ENTER_CHAT', (data) => {
           console.log("ENTER CHAT EVENT CLIENT, data: ", data.user);
           this.messages.push(data);
         });
 
+        //event where user is typing
         this.socket.on('TYPING', (data) => {
           console.log("Typing event");
           this.typemsg = data.user + " is typing a message...\n";
         });
 
+        //event to remove typing text
         this.socket.on('TYPINGDONE', (data) => {
           console.log("Done typing event");
           this.typemsg = "";
         });
 
+        //event to update users list
+        this.socket.on('USERS', (data) => {
+          console.log("USERS event data: ", data);
+            this.users = data;
+            console.log("this.users:", Object.keys(this.users));
+        });
+
+        //event when someone leaves the chat
+        this.socket.on('LEAVE_CHAT', (data) => {
+          console.log("LEAVE CHAT EVENT CLIENT, data: ", data);
+          this.messages.push({
+            user: this.currentUser,
+            message: `${data} has left the chat`,
+            server: true
+          });
+        });
   }
 }
 </script>
