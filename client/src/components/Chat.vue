@@ -5,7 +5,7 @@
         <span style="display: inline-block;">
           <h3>Chat Group</h3>
           <button v-if="users != null" style="float: right;" @click="showUsers">
-            {{ Object.keys(users).length }} connected currently.
+            {{ users.length }} connected currently.
           </button>
         </span>
         <hr />
