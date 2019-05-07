@@ -24,8 +24,6 @@
 </template>
 
 <script>
-import io from "socket.io-client";
-
 export default {
   data() {
     return {
@@ -38,7 +36,6 @@ export default {
   methods: {
     loginUser(e) {
       e.preventDefault();
-      console.log("in login");
       this.$emit("loginUser", this.user);
     }
   }

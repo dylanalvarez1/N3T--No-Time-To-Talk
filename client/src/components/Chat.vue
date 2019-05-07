@@ -5,7 +5,7 @@
         <span style="display: inline-block;">
           <h3>Chat Group</h3>
           <button v-if="users != null" style="float: right;" @click="showUsers">
-            {{ Object.keys(this.users).length }}
+            {{ Object.keys(users).length }}
           </button>
         </span>
         <hr />
@@ -35,8 +35,8 @@
         </div>
       </div>
     </div>
-    <i>{{ this.typemsg }}</i>
-    <br v-if="this.typemsg != ''" /><br />
+    <i>{{ typemsg }}</i>
+    <br v-if="typemsg != ''" /><br />
     <div class="input-area">
       <form @submit.prevent="sendMessage">
         <div class="message-input">
@@ -59,7 +59,12 @@
 import io from "socket.io-client";
 
 export default {
-  props: ["user"],
+  props: {
+    user: {
+      type: String,
+      default: ""
+    }
+  },
   data() {
     return {
       currentUser: "",
@@ -84,37 +89,30 @@ export default {
     //event for messaging
     this.socket.on("MESSAGE", data => {
       this.messages.push(data);
-      console.log(JSON.stringify(data));
     });
 
     //event when someone enters chat
     this.socket.on("ENTER_CHAT", data => {
-      console.log("ENTER CHAT EVENT CLIENT, data: ", data.user);
       this.messages.push(data);
     });
 
     //event where user is typing
     this.socket.on("TYPING", data => {
-      console.log("Typing event");
       this.typemsg = data.user + " is typing a message...\n";
     });
 
     //event to remove typing text
-    this.socket.on("TYPINGDONE", data => {
-      console.log("Done typing event");
+    this.socket.on("TYPINGDONE", () => {
       this.typemsg = "";
     });
 
     //event to update users list
     this.socket.on("USERS", data => {
-      console.log("USERS event data: ", data);
       this.users = data;
-      console.log("this.users:", Object.keys(this.users));
     });
 
     //event when someone leaves the chat
     this.socket.on("LEAVE_CHAT", data => {
-      console.log("LEAVE CHAT EVENT CLIENT, data: ", data);
       this.messages.push({
         user: this.currentUser,
         message: `${data} has left the chat`,
@@ -141,22 +139,16 @@ export default {
         user: this.currentUser
       });
 
-      console.log("Typing event");
-
       //Send a not typing message after 3 seconds of no keyboard activity
       //if no timer, create one
       if (this.timer == null) {
         this.timer = setTimeout(() => {
           this.socket.emit("TYPINGDONE", {});
-          console.log("TIMER DONE");
-          console.log(this.timer);
           this.timer = null;
-          console.log(this.timer);
         }, 3000);
       }
       //if timer already, replace and reset it
       else {
-        console.log("do nothing");
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {
           this.socket.emit("TYPINGDONE", {});
@@ -165,10 +157,7 @@ export default {
     },
     showUsers() {
       if (this.users != {}) {
-        let users = Object.keys(this.users);
-        console.log(users);
-      } else {
-        console.log("no users");
+        //let users = Object.keys(this.users);
       }
     }
   }
@@ -187,7 +176,7 @@ export default {
   text-align: left;
 }
 .card-title {
-  text-color: black;
+  color: black;
 }
 .past-messages {
   text-align: left !important;

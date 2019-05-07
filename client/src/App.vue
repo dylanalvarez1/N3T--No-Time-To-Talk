@@ -29,8 +29,6 @@ export default {
     loginUser(name) {
       this.user = name;
       this.login = true;
-      console.log("2nd log event method");
-      console.log(name);
     }
   }
 };
