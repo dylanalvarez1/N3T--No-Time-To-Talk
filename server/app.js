@@ -9,15 +9,21 @@ server = app.listen(3001, function(){
 
 const io = require('socket.io')(server);
 io.set('origins', '*:*');
+let users = {};
+let rooms = {};
 io.on('connection', function(socket) {
 
     console.log(socket.id);
 
     //Creates dict to link <username, socket.id>
-    let users = {};
 
     io.emit('USERS', users);
+    io.emit('ROOMS', rooms);
 
+    socket.on('CREATE_CHAT', function(data) {
+        console.log('chat creation');
+        rooms[data] = 'on';
+    })
     socket.on('SEND_MESSAGE', function(data) {
         console.log("server send message");
         io.emit('MESSAGE', data);
