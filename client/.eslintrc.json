@@ -1,0 +1,12 @@
+{
+    "extends": ["plugin:prettier/recommended", "plugin:vue/recommended", "prettier/vue", "eslint:recommended"],
+    "parserOptions": {
+        "parser": "babel-eslint",
+        "ecmaVersion": 2017,
+        "sourceType": "module"
+    },
+    "env": {
+        "node": true,
+        "browser": true
+    }
+}
