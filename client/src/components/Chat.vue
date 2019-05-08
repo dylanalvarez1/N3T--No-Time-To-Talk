@@ -1,7 +1,7 @@
 <template>
   <div>
-    <MessageDisplay :user="user" />
-    <MessageInput :user="user" />
+    <MessageDisplay :user="user" :socket="socket" />
+    <MessageInput :user="user" :socket="socket" />
   </div>
 </template>
 

@@ -1,5 +1,9 @@
 {
     "extends": ["plugin:prettier/recommended", "plugin:vue/recommended", "prettier/vue", "eslint:recommended"],
+    "plugins": ["prettier"],
+    "rules": {
+        "prettier/prettier": ["error"]
+    },
     "parserOptions": {
         "parser": "babel-eslint",
         "ecmaVersion": 2017,

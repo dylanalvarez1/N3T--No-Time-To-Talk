@@ -30,7 +30,8 @@ io.on('connection', function(socket) {
         socket.broadcast.emit('ENTER_CHAT', data);
         
         //Associate the user id with the user nickname
-        users.push({ name: data.user, id: socket.id });
+        let user = { name: data.user, id: socket.id };
+        users.push(user);
        
         //Update clients with user list
         io.emit('USERS', users);
@@ -47,6 +48,10 @@ io.on('connection', function(socket) {
         io.emit('USERS', users);
     });
 
+    socket.on('CREATE A ROOM', function() {
+        //TODO: Create another room
+    });
+
     socket.on('disconnect', function() {
         let leavingUser = '';
         users = users.filter(user => {
@@ -54,12 +59,11 @@ io.on('connection', function(socket) {
                 leavingUser = user.name;
             return user.id != socket.id;
         });
-
         // send leave message for the room
         io.emit('LEAVE_CHAT', leavingUser);
         
         // Update clients
-        io.emit('USERS', users);
+        io.emit('REMOVE_USER', leavingUser);
         
     });
 });

@@ -8,7 +8,7 @@ export default new Router({
   routes: [
     {
       path: "*",
-      redirect: "/about/"
+      redirect: "/"
     },
     {
       path: "/",
@@ -16,13 +16,13 @@ export default new Router({
       component: Home
     },
     {
-      path: "/about",
-      name: "about",
+      path: "/home",
+      name: "landing",
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () =>
-        import(/* webpackChunkName: "about" */ "./views/About.vue")
+        import(/* webpackChunkName: "about" */ "./views/Landing.vue")
     }
   ]
 });

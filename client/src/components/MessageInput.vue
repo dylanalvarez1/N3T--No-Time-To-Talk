@@ -1,45 +1,41 @@
 <template>
   <div>
-    <i id="typemessage">{{ typemsg }}</i>
-    <br v-if="typemsg != ''" /><br />
     <div class="input-area">
-      <form @submit.prevent="sendMessage">
-        <div class="message-input">
-          <!--hr v-if="messages[0] != null" -->
-          <label for="message">Message: </label>
-          <input
-            v-model="message"
-            type="text"
-            class="input"
-            @input="typingHandler"
-          />
-          <input type="submit" class="submit-button" value="Send" />
-        </div>
-      </form>
+      <md-field @submit.prevent="sendMessage">
+        <md-textarea
+          v-model="message"
+          type="text"
+          class="input"
+          placeholder="Type here!"
+          @keydown="typingHandler"
+        />
+      </md-field>
+      <i id="typemessage">{{ typemsg }}</i>
     </div>
   </div>
 </template>
 
 <script>
-import io from "socket.io-client";
 export default {
   props: {
     user: {
       type: String,
       default: ""
+    },
+    socket: {
+      type: Object,
+      default: null
     }
   },
   data() {
     return {
       currentUser: "",
       message: "",
-      socket: io("localhost:3001"),
       typemsg: ""
     };
   },
   mounted() {
     this.currentUser = this.user;
-
     //event where user is typing
     this.socket.on("TYPING", data => {
       this.typemsg = data.user + " is typing a message...\n";
@@ -57,13 +53,17 @@ export default {
       this.socket.emit("SEND_MESSAGE", {
         user: this.currentUser,
         message: this.message,
+        timestamp: new Date().toISOString(),
         server: false
       });
 
       this.socket.emit("TYPINGDONE", {});
       this.message = "";
     },
-    typingHandler() {
+    typingHandler(e) {
+      if (e.keyCode === 13) {
+        this.sendMessage(e);
+      }
       this.socket.emit("TYPING", {
         user: this.currentUser
       });
@@ -90,6 +90,8 @@ export default {
 <style scoped>
 .input-area {
   text-align: center;
+  padding: 0 0 0 20%;
+  width: 70%;
 }
 
 html {
@@ -100,9 +102,5 @@ html {
 *:before,
 *:after {
   box-sizing: inherit;
-}
-
-#typemessage {
-  margin: 20%;
 }
 </style>

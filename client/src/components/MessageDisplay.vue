@@ -3,9 +3,14 @@
     <div class="card-title">
       <span style="display: inline-block;">
         <h3>Chat Group</h3>
-        <button v-if="users != null" style="float: right;">
+        <button v-if="users != null">
           {{ users.length }} connected currently.
         </button>
+        <span v-if="users != null">
+          <p v-for="(user, index) in users" :key="index">
+            {{ `${user.name} has ${user.id}` }}
+          </p>
+        </span>
       </span>
       <hr />
     </div>
@@ -16,11 +21,11 @@
             <span style="margin-left: 0px; ">
               <i>
                 [{{
-                  new Date().getHours() +
+                  new Date(msg.timestamp).getHours() +
                     ":" +
-                    (new Date().getMinutes() > 9
-                      ? new Date().getMinutes()
-                      : "0" + new Date().getMinutes())
+                    (new Date(msg.timestamp).getMinutes() > 9
+                      ? new Date(msg.timestamp).getMinutes()
+                      : "0" + new Date(msg.timestamp).getMinutes())
                 }}]
               </i>
               <b>{{ ` ${msg.user}: ` }}</b>
@@ -37,13 +42,15 @@
 </template>
 
 <script>
-import io from "socket.io-client";
-
 export default {
   props: {
     user: {
       type: String,
       default: ""
+    },
+    socket: {
+      type: Object,
+      default: null
     }
   },
   data() {
@@ -51,7 +58,6 @@ export default {
       currentUser: "",
       message: "",
       messages: [],
-      socket: io("localhost:3001"),
       typemsg: "",
       timer: null,
       users: null
@@ -71,10 +77,17 @@ export default {
     });
 
     //event to update users list
-    this.socket.on("USERS", data => {
-      this.users = data;
+    this.socket.on("ADD_USER", user => {
+      this.users.push(user);
     });
 
+    this.socket.on("USERS", users => {
+      this.users = users;
+    });
+
+    this.socket.on("REMOVE_USER", leavingUser => {
+      this.users = this.users.filter(user => user.name != leavingUser);
+    });
     //event when someone leaves the chat
     this.socket.on("LEAVE_CHAT", data => {
       this.messages.push({
@@ -98,11 +111,11 @@ export default {
   border-style: line;
   border-radius: 2px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0;
-  overflow-y: scroll;
+  overflow-y: auto;
   word-wrap: break-word;
   overflow-wrap: break-word;
   margin-left: 20%;
-  height: 80vh;
+  height: 60vh;
 }
 
 .card-title {
