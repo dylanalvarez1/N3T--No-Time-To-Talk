@@ -1,8 +1,13 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
+app.use(cors());
 
 server = app.listen(3001, function(){
     console.log('server is running on port 3001')
+});
+app.get('/', function (req, res, next) {
+    res.send("hello world");
 });
 
 
@@ -43,11 +48,17 @@ io.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
+        let leavingUser = '';
+        users = users.filter(user => {
+            if (socket.id == user.id)
+                leavingUser = user.name;
+            return user.id != socket.id;
+        });
 
-        users = users.filter(user => user.id != socket.id);
-        socket.emit('LEAVE_CHAT', socket.id);
+        // send leave message for the room
+        io.emit('LEAVE_CHAT', leavingUser);
         
-        //Update clients
+        // Update clients
         io.emit('USERS', users);
         
     });
