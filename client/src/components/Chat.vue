@@ -1,30 +1,36 @@
 <template>
   <div>
-    <MessageDisplay :user="user" :socket="socket" />
+    <BoardSelection :socket="socket" />
+    <div class="flexboxing">
+      <BoardDisplay :user="user" :socket="socket" />
+      <HeadCount :socket="socket" />
+    </div>
     <MessageInput :user="user" :socket="socket" />
   </div>
 </template>
 
 <script>
-import io from "socket.io-client";
 import MessageInput from "@/components/MessageInput";
-import MessageDisplay from "@/components/MessageDisplay";
+import BoardDisplay from "@/components/BoardDisplay";
+import BoardSelection from "@/components/BoardSelection";
+import HeadCount from "@/components/HeadCount";
 
 export default {
   components: {
+    BoardSelection,
+    BoardDisplay,
     MessageInput,
-    MessageDisplay
+    HeadCount
   },
   props: {
     user: {
       type: String,
       default: ""
+    },
+    socket: {
+      type: Object,
+      default: null
     }
-  },
-  data() {
-    return {
-      socket: io("localhost:3001")
-    };
   },
   mounted() {
     //Format the data so it can display correctly
@@ -36,4 +42,11 @@ export default {
   }
 };
 </script>
-<style scoped></style>
+<style scoped>
+.flexboxing {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+</style>

@@ -87,6 +87,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .input-area {
   text-align: center;
