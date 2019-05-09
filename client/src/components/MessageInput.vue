@@ -25,6 +25,10 @@ export default {
     socket: {
       type: Object,
       default: null
+    },
+    room: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -49,15 +53,17 @@ export default {
   methods: {
     sendMessage(e) {
       e.preventDefault();
-
       this.socket.emit("SEND_MESSAGE", {
         user: this.currentUser,
         message: this.message,
         timestamp: new Date().toISOString(),
-        server: false
+        server: false,
+        room: this.room
       });
 
-      this.socket.emit("TYPINGDONE", {});
+      this.socket.emit("TYPINGDONE", {
+        room: this.room
+      });
       this.message = "";
     },
     typingHandler(e) {
@@ -65,14 +71,17 @@ export default {
         this.sendMessage(e);
       }
       this.socket.emit("TYPING", {
-        user: this.currentUser
+        user: this.currentUser,
+        room: this.room
       });
 
       //Send a not typing message after 3 seconds of no keyboard activity
       //if no timer, create one
       if (this.timer == null) {
         this.timer = setTimeout(() => {
-          this.socket.emit("TYPINGDONE", {});
+          this.socket.emit("TYPINGDONE", {
+            room: this.room
+          });
           this.timer = null;
         }, 3000);
       }
@@ -80,7 +89,9 @@ export default {
       else {
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {
-          this.socket.emit("TYPINGDONE", {});
+          this.socket.emit("TYPINGDONE", {
+            room: this.room
+          });
         }, 3000);
       }
     }

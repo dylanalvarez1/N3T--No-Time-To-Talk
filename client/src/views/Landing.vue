@@ -1,13 +1,13 @@
 <template>
   <div class="Landing">
     <div v-if="login" class="menu">
-      <h1>Realchan</h1>
-      <md-field class="text-area">
-        <label>Search here!</label>
-        <md-input v-model="type"></md-input>
-        <span class="md-helper-text">Search for a chat!</span>
-      </md-field>
-      <Chat :user="user" :socket="socket" />
+      <h1>Breakroom</h1>
+      <Chat
+        :user="user"
+        :socket="socket"
+        :room="room"
+        @updateRoom="changeRoom"
+      />
     </div>
     <Login v-else @loginUser="loginUser" />
   </div>
@@ -27,12 +27,10 @@ export default {
   data() {
     return {
       user: "",
-      type: "",
       login: false,
-      create: false,
-      number: 2,
-      topic: "",
-      socket: io("localhost:3001")
+      socket: io("localhost:3001"),
+      type: "",
+      room: "Global"
     };
   },
   methods: {
@@ -40,16 +38,15 @@ export default {
       this.user = name;
       this.login = true;
     },
-    openForm() {
-      this.create = true;
-    },
-    formClose() {
-      this.create = false;
-    },
-    createRoom() {
-      this.socket.emit("CREATE A ROOM", {
+    changeRoom(room) {
+      this.room = room;
+      this.socket.emit("SUBSCRIBE", {
         topic: this.topic,
-        amount: this.number
+        amount: this.number,
+        room: this.room
+      });
+      this.socket.emit("UNSUBSCRIBE", {
+        room: this.room
       });
     }
   }
@@ -68,8 +65,5 @@ h1 {
   border-style: solid;
   border-color: black;
   border-radius: 1px;
-}
-.form {
-  margin: 25%;
 }
 </style>

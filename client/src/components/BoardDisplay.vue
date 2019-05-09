@@ -1,6 +1,10 @@
 <template>
   <md-content id="message-area" class="display-container">
-    <div v-for="(msg, index) in messages" :key="index" class="messages">
+    <div
+      v-for="(msg, index) in messages.filter(message => message.room === room)"
+      :key="index"
+      class="messages"
+    >
       <span v-if="!msg.server">
         <div style="display: inline-block; width: 100%; ">
           <span style="margin-left: 0px; ">
@@ -35,6 +39,10 @@ export default {
     socket: {
       type: Object,
       default: null
+    },
+    room: {
+      type: String,
+      default: ""
     }
   },
   data() {
