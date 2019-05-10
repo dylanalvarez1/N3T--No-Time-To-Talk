@@ -8,7 +8,7 @@
         <md-card-content>
           <md-field>
             <label for="name">Username:</label>
-            <md-input v-model="user" type="text" class="input" />
+            <md-input v-model="name" type="text" class="input" />
           </md-field>
           <md-card-actions>
             <md-button type="submit" class="md-raised md-primary"
@@ -25,16 +25,13 @@
 export default {
   data() {
     return {
-      user: ""
+      name: ""
     };
-  },
-  mounted() {
-    this.currentUser = this.user;
   },
   methods: {
     loginUser(e) {
       e.preventDefault();
-      this.$emit("loginUser", this.user);
+      this.$emit("loginUser", this.name);
     }
   }
 };

@@ -2,15 +2,30 @@
   <div id="app">
     <div class="wrapper">
       <transition name="fade" mode="out-in">
-        <router-view />
+        <router-view :user="user" @loginUser="loginUser" />
       </transition>
     </div>
   </div>
 </template>
 
 <script>
+import isAuth from "./isAuth";
+
 export default {
-  name: "App"
+  name: "App",
+  data() {
+    return {
+      user: ""
+    };
+  },
+  methods: {
+    loginUser(name) {
+      this.user = name;
+      isAuth.authenticate(() => null);
+
+      this.$router.push("/landing");
+    }
+  }
 };
 </script>
 

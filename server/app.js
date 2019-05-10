@@ -19,6 +19,7 @@ let rooms = [];
 
 io.on('connection', function (socket) {
 
+    console.log(socket.id);
     socket.on('CREATE_CHAT', function (data) {
         rooms[data] = 'on';
     })
