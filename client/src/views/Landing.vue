@@ -1,7 +1,7 @@
 <template>
   <div class="Landing">
     <h1>Breakroom</h1>
-    <Chat :user="user" :socket="socket" :room="room" @updateRoom="changeRoom" />
+    <Chat :user="user" :socket="socket" @updateRoom="changeRoom" />
   </div>
 </template>
 
@@ -23,8 +23,7 @@ export default {
   data() {
     return {
       socket: io("localhost:3001"),
-      type: "",
-      room: "Global"
+      type: ""
     };
   },
   mounted() {

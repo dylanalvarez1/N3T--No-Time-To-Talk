@@ -3,13 +3,19 @@
     <span style="display: inline-block;">
       <h3>Boards</h3>
     </span>
-    <md-tabs md-sync-route @md-changed="updateRoom">
-      <md-tab id="Global" md-label="Global" to></md-tab>
-      <md-tab id="Games" md-label="Games" to></md-tab>
-      <md-tab id="Anime" md-label="Anime" to></md-tab>
-      <md-tab id="Manga" md-label="Manga" to></md-tab>
-      <md-tab id="Code" md-label="Code" to></md-tab>
-      <md-tab id="add" md-icon="add" @click="showCreateBoard"></md-tab>
+    <md-tabs md-sync-route>
+      <md-tab
+        v-for="(board, index) in boards"
+        :id="board"
+        :key="index"
+        :md-label="board"
+        :to="board"
+      ></md-tab>
+      <md-tab
+        id="add"
+        md-icon="add"
+        :to="$route.params.room + '/find_room'"
+      ></md-tab>
     </md-tabs>
   </md-content>
 </template>

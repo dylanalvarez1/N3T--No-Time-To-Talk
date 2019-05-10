@@ -23,7 +23,7 @@ export default {
       this.user = name;
       isAuth.authenticate(() => null);
 
-      this.$router.push("/landing");
+      this.$router.push("/room/global");
     }
   }
 };

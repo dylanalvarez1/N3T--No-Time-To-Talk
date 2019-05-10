@@ -53,6 +53,7 @@ export default {
   methods: {
     sendMessage(e) {
       e.preventDefault();
+
       this.socket.emit("SEND_MESSAGE", {
         user: this.currentUser,
         message: this.message,
