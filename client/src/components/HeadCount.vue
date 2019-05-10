@@ -1,8 +1,11 @@
 <template>
-  <div>
-    <md-content md-permanent="full" class="display-container">
-      <md-toolbar class="md-transparent" md-elevation="0">
-        {{ users.length }} connected currently.
+  <div class="list">
+    <md-content md-permanent="full">
+      <md-toolbar class="md-transparent toolbar" md-elevation="0">
+        <p>{{ users.length }} in {{ $route.params.room }}.</p>
+        <md-button class="md-raised leavebtn" @click="leaveRoom"
+          >Leave</md-button
+        >
       </md-toolbar>
 
       <span v-if="users != null">
@@ -41,19 +44,28 @@ export default {
       this.users = this.users.filter(user => user.name != leavingUser);
     });
     //event when someone leaves the chat
+  },
+  methods: {
+    leaveRoom() {
+      this.$emit("leaveRoom");
+    }
   }
 };
 </script>
 <style scoped>
-.display-container {
-  padding: 10px;
-  border-style: line;
-  border-radius: 2px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0;
-  overflow-y: auto;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  margin-left: 0%;
+.list {
   height: 40vh;
+  width: 20%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0;
+  background-color: white;
+}
+.leavebtn {
+  margin-right: 0%;
+}
+.toolbar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  width: 100%;
 }
 </style>

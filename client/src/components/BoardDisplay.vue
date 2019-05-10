@@ -56,7 +56,6 @@ export default {
   },
   mounted() {
     this.currentUser = this.user;
-    this.$emit("getBoard", this.$route.params.room);
 
     //event for messaging
     this.socket.on("MESSAGE", data => {

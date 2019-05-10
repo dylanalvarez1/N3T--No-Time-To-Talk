@@ -1,13 +1,12 @@
 <template>
   <div class="Landing">
     <h1>Breakroom</h1>
-    <Chat :user="user" :socket="socket" @updateRoom="changeRoom" />
+    <Chat :user="user" />
   </div>
 </template>
 
 <script>
 import Chat from "@/components/Chat.vue";
-import io from "socket.io-client";
 
 export default {
   name: "Landing",
@@ -18,30 +17,6 @@ export default {
     user: {
       type: String,
       default: ""
-    }
-  },
-  data() {
-    return {
-      socket: io("localhost:3001"),
-      type: ""
-    };
-  },
-  mounted() {
-    if (this.user === "") {
-      this.$router.push("/login");
-    }
-  },
-  methods: {
-    changeRoom(room) {
-      this.room = room;
-      this.socket.emit("SUBSCRIBE", {
-        topic: this.topic,
-        amount: this.number,
-        room: this.room
-      });
-      this.socket.emit("UNSUBSCRIBE", {
-        room: this.room
-      });
     }
   }
 };

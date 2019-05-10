@@ -1,13 +1,14 @@
 <template>
   <div>
     <BoardSelection
+      :key="updater"
       :socket="socket"
       :boards="rooms"
       @currentRoom="updateRoom"
     />
     <div class="flexboxing">
       <router-view :user="user" :socket="socket" />
-      <HeadCount :socket="socket" :room="room" />
+      <HeadCount :socket="socket" :room="room" @leaveRoom="leaveRoom" />
     </div>
     <MessageInput :user="user" :socket="socket" :room="room" />
   </div>
@@ -17,6 +18,7 @@
 import MessageInput from "@/components/MessageInput";
 import BoardSelection from "@/components/BoardSelection";
 import HeadCount from "@/components/HeadCount";
+import io from "socket.io-client";
 
 export default {
   components: {
@@ -28,17 +30,15 @@ export default {
     user: {
       type: String,
       default: ""
-    },
-    socket: {
-      type: Object,
-      default: null
     }
   },
   data() {
     return {
       showCreateBoard: false,
       room: "global",
-      rooms: ["global", "games", "anime", "manga", "code"]
+      rooms: ["global", "games", "anime", "manga", "code"],
+      socket: io("localhost:3001"),
+      updater: 0
     };
   },
   watch: {
@@ -59,7 +59,15 @@ export default {
   },
   methods: {
     updateRoom(room) {
-      this.$emit("updateRoom", room);
+      this.room = room;
+    },
+    leaveRoom() {
+      this.socket.emit("UNSUBSCRIBE", {
+        room: this.room
+      });
+      this.rooms = this.rooms.filter(room => room != this.room);
+      this.updater += 1;
+      this.$router.push("global");
     }
   }
 };

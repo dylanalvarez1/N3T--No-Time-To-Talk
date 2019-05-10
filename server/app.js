@@ -53,13 +53,10 @@ io.on('connection', function (socket) {
     });
 
     socket.on('UNSUBSCRIBE', function (data) {
-        //unsubscribe from everything but data.room
-        let arr = ['Global', 'Games', 'Anime'];
-        arr.forEach(el => {
-            if (data.room != el) {
-                socket.leave(el);
-            }
-        })
+        //unsubscribe from room
+        if (data.room != "global") {
+            socket.leave(data.room);
+        }
     });
 
     socket.on('disconnect', function (data) {
