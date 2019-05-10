@@ -1,35 +1,12 @@
 <template>
   <div>
-    <CreateBoard
-      :socket="socket"
-      :show-dialog="showCreateBoard"
-      :room="room"
-      @hideBoard="hideBoard"
-    />
     <BoardSelection
       :socket="socket"
-      @showCreateBoard="showBoard"
+      :boards="rooms"
       @currentRoom="updateRoom"
     />
     <div class="flexboxing">
-      <BoardDisplay
-        v-show="room == 'Global'"
-        :user="user"
-        :socket="socket"
-        :room="'Global'"
-      />
-      <BoardDisplay
-        v-show="room == 'Games'"
-        :user="user"
-        :socket="socket"
-        :room="'Games'"
-      />
-      <BoardDisplay
-        v-show="room == 'Anime'"
-        :user="user"
-        :socket="socket"
-        :room="'Anime'"
-      />
+      <router-view :user="user" :socket="socket" />
       <HeadCount :socket="socket" :room="room" />
     </div>
     <MessageInput :user="user" :socket="socket" :room="room" />
@@ -38,18 +15,14 @@
 
 <script>
 import MessageInput from "@/components/MessageInput";
-import BoardDisplay from "@/components/BoardDisplay";
 import BoardSelection from "@/components/BoardSelection";
 import HeadCount from "@/components/HeadCount";
-import CreateBoard from "@/components/CreateBoard";
 
 export default {
   components: {
     BoardSelection,
-    BoardDisplay,
     MessageInput,
-    HeadCount,
-    CreateBoard
+    HeadCount
   },
   props: {
     user: {
@@ -59,33 +32,32 @@ export default {
     socket: {
       type: Object,
       default: null
-    },
-    room: {
-      type: String,
-      default: "Global"
     }
   },
   data() {
     return {
-      showCreateBoard: false
+      showCreateBoard: false,
+      room: "global",
+      rooms: ["global", "games", "anime", "manga", "code"]
     };
+  },
+  watch: {
+    $route: function(to) {
+      this.room = to.params.room;
+    }
   },
   mounted() {
     //Format the data so it can display correctly
-    this.socket.emit("ENTER_CHAT", {
-      user: this.user,
-      message: `${this.user} has joined the chat!`,
-      server: true,
-      room: this.room
+    this.rooms.forEach(room => {
+      this.socket.emit("ENTER_CHAT", {
+        user: this.user,
+        message: `${this.user} has joined the chat!`,
+        server: true,
+        room
+      });
     });
   },
   methods: {
-    showBoard(bool) {
-      this.showCreateBoard = bool;
-    },
-    hideBoard(bool) {
-      this.showCreateBoard = bool;
-    },
     updateRoom(room) {
       this.$emit("updateRoom", room);
     }

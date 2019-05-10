@@ -1,43 +1,37 @@
 <template>
   <div class="Landing">
-    <div v-if="login" class="menu">
-      <h1>Breakroom</h1>
-      <Chat
-        :user="user"
-        :socket="socket"
-        :room="room"
-        @updateRoom="changeRoom"
-      />
-    </div>
-    <Login v-else @loginUser="loginUser" />
+    <h1>Breakroom</h1>
+    <Chat :user="user" :socket="socket" @updateRoom="changeRoom" />
   </div>
 </template>
 
 <script>
 import Chat from "@/components/Chat.vue";
-import Login from "@/components/Login.vue";
 import io from "socket.io-client";
 
 export default {
   name: "Landing",
   components: {
-    Chat,
-    Login
+    Chat
+  },
+  props: {
+    user: {
+      type: String,
+      default: ""
+    }
   },
   data() {
     return {
-      user: "",
-      login: false,
       socket: io("localhost:3001"),
-      type: "",
-      room: "Global"
+      type: ""
     };
   },
+  mounted() {
+    if (this.user === "") {
+      this.$router.push("/login");
+    }
+  },
   methods: {
-    loginUser(name) {
-      this.user = name;
-      this.login = true;
-    },
     changeRoom(room) {
       this.room = room;
       this.socket.emit("SUBSCRIBE", {

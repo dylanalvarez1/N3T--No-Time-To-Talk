@@ -1,7 +1,7 @@
 <template>
   <div class="form">
     <md-dialog
-      :md-active.sync="showDialog"
+      :md-active="true"
       @md-clicked-outside="formClose"
       @md-closed="formClose"
     >
@@ -33,10 +33,6 @@
 <script>
 export default {
   props: {
-    showDialog: {
-      type: Boolean,
-      default: false
-    },
     socket: {
       type: Object,
       default: null
@@ -59,16 +55,8 @@ export default {
     };
   },
   methods: {
-    loginUser(name) {
-      this.user = name;
-      this.login = true;
-    },
-    openForm() {
-      this.showDialog = true;
-    },
     formClose() {
-      this.showDialog = false;
-      this.$emit("hideBoard", false);
+      this.$router.go(-1);
     },
     createRoom() {
       this.socket.emit("SUBSCRIBE", {

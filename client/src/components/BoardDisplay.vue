@@ -1,7 +1,9 @@
 <template>
   <md-content id="message-area" class="display-container">
     <div
-      v-for="(msg, index) in messages.filter(message => message.room === room)"
+      v-for="(msg, index) in messages.filter(
+        message => message.room === $route.params.room
+      )"
       :key="index"
       class="messages"
     >
@@ -26,6 +28,7 @@
         <i>{{ `${msg.message}` }}</i>
       </div>
     </div>
+    <router-view />
   </md-content>
 </template>
 
@@ -39,10 +42,6 @@ export default {
     socket: {
       type: Object,
       default: null
-    },
-    room: {
-      type: String,
-      default: ""
     }
   },
   data() {
@@ -57,6 +56,7 @@ export default {
   },
   mounted() {
     this.currentUser = this.user;
+    this.$emit("getBoard", this.$route.params.room);
 
     //event for messaging
     this.socket.on("MESSAGE", data => {

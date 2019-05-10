@@ -15,13 +15,8 @@ app.get('/', function (req, res, next) {
 const io = require('socket.io')(server);
 io.set('origins', '*:*');
 let users = [];
-let rooms = [];
 
 io.on('connection', function (socket) {
-
-    socket.on('CREATE_CHAT', function (data) {
-        rooms[data] = 'on';
-    })
 
     socket.on('SEND_MESSAGE', function (data) {
         io.sockets.in(data.room).emit('MESSAGE', data);
@@ -33,7 +28,9 @@ io.on('connection', function (socket) {
 
         //Associate the user id with the user nickname
         let user = { name: data.user, id: socket.id };
-        users.push(user);
+        if (users.filter(user => user.id === socket.id) == 0) {
+            users.push(user);
+        }
 
         //Update clients with user list
         io.sockets.in(data.room).emit('USERS', users);
