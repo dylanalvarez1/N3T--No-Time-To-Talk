@@ -28,7 +28,7 @@
         <i>{{ `${msg.message}` }}</i>
       </div>
     </div>
-    <router-view />
+    <router-view :socket="socket" />
   </md-content>
 </template>
 
@@ -49,15 +49,10 @@ export default {
       currentUser: "",
       message: "",
       messages: [],
-      typemsg: "",
-      timer: null,
-      users: null
+      typemsg: ""
     };
   },
   mounted() {
-    this.currentUser = this.user;
-    this.$emit("getBoard", this.$route.params.room);
-
     //event for messaging
     this.socket.on("MESSAGE", data => {
       this.messages.push(data);
@@ -68,16 +63,12 @@ export default {
       this.messages.push(data);
     });
 
-    //event to update users list
-    this.socket.on("ADD_USER", user => {
-      this.users.push(user);
-    });
-
     this.socket.on("LEAVE_CHAT", data => {
       this.messages.push({
-        user: this.currentUser,
-        message: `${data} has left the chat`,
-        server: true
+        user: this.user,
+        message: `${data.name} has left the chat`,
+        server: true,
+        room: data.room
       });
     });
   },

@@ -1,15 +1,16 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Landing from "./views/Landing";
-import Login from "./components/Login";
+import Login from "./views/Login";
 import isAuth from "./isAuth";
-import BoardDisplay from "./components/BoardDisplay";
-import CreateBoard from "./components/CreateBoard";
+import RoomMessages from "./components/RoomMessages";
+import CreateRoom from "./components/CreateRoom";
 
 Vue.use(Router);
 
 let router = new Router({
   linkActiveClass: "md-active",
+  linkExactActiveClass: "md-active",
   routes: [
     {
       path: "/login",
@@ -26,11 +27,11 @@ let router = new Router({
       children: [
         {
           path: "room/:room",
-          component: BoardDisplay,
+          component: RoomMessages,
           children: [
             {
               path: "find_room",
-              component: CreateBoard
+              component: CreateRoom
             }
           ]
         }

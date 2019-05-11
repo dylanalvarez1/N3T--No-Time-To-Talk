@@ -24,17 +24,31 @@ io.on('connection', function (socket) {
 
     socket.on('ENTER_CHAT', function (data) {
         socket.join(data.room);
+        let user = { name: data.user, id: socket.id, room: data.room };
+        users.push(user);
+
+        //get the userlist for the room, includes newcomer
+        let newUsers = users.filter(user =>
+            user.room === data.room
+        );
+        io.sockets.in(data.room).emit('GET_USERS_IN_ROOM', { users: newUsers, room: data.room });
+
         io.sockets.in(data.room).emit('ENTER_CHAT', data);
 
-        //Associate the user id with the user nickname
-        let user = { name: data.user, id: socket.id };
-        if (users.filter(user => user.id === socket.id) == 0) {
-            users.push(user);
-        }
 
-        //Update clients with user list
-        io.sockets.in(data.room).emit('USERS', users);
     });
+
+    socket.on('LEAVE_CHAT', function (data) {
+        socket.leave(data.room);
+        io.sockets.in(data.room).emit('LEAVE_CHAT', data);
+    });
+
+    socket.on('CREATE_CHAT', function (data) {
+
+        socket.emit('CREATE_CHAT', data);
+        // for searching later
+        // io.emit('UPDATE_SEARCH_LIST', data);
+    })
     socket.on('TYPING', function (data) {
         io.sockets.in(data.room).emit('TYPING', data);
     });
@@ -43,37 +57,17 @@ io.on('connection', function (socket) {
         io.sockets.in(data.room).emit('TYPINGDONE', data);
     });
 
-    socket.on('USERS', function (data) {
-        io.sockets.in(data.room).emit('USERS', users);
-    });
-
-    socket.on('SUBSCRIBE', function (data) {
-        //Create another room
-        socket.join(data.room);
-    });
-
-    socket.on('UNSUBSCRIBE', function (data) {
-        //unsubscribe from everything but data.room
-        let arr = ['Global', 'Games', 'Anime'];
-        arr.forEach(el => {
-            if (data.room != el) {
-                socket.leave(el);
-            }
-        })
-    });
-
     socket.on('disconnect', function (data) {
-        let leavingUser = '';
-        users = users.filter(user => {
-            if (socket.id == user.id)
-                leavingUser = user.name;
-            return user.id != socket.id;
-        });
-        // send leave message for the room
-        io.sockets.in(data.room).emit('LEAVE_CHAT', leavingUser);
+        users = users.filter(user =>
+            user.id == socket.id
+        );
+        users.forEach(user => {
+            io.sockets.in(user.room).emit('LEAVE_CHAT', user);
 
-        // Update clients
-        io.sockets.in(data.room).emit('REMOVE_USER', leavingUser);
+            // Update clients
+            io.sockets.in(user.room).emit('REMOVE_USER', user);
+
+        })
 
     });
 });

@@ -1,15 +1,15 @@
 <template>
   <md-content class="card-title">
     <span style="display: inline-block;">
-      <h3>Boards</h3>
+      <h3>rooms</h3>
     </span>
-    <md-tabs md-sync-route>
+    <md-tabs md-sync-route :md-active-tab="$route.params.room">
       <md-tab
-        v-for="(board, index) in boards"
-        :id="board"
+        v-for="(room, index) in rooms"
+        :id="room"
         :key="index"
-        :md-label="board"
-        :to="board"
+        :md-label="room"
+        :to="room"
       ></md-tab>
       <md-tab
         id="add"
@@ -23,20 +23,9 @@
 <script>
 export default {
   props: {
-    boards: {
+    rooms: {
       type: Array,
       default: () => []
-    }
-  },
-  mounted() {
-    this.currentUser = this.user;
-  },
-  methods: {
-    showCreateBoard() {
-      this.$emit("showCreateBoard", true);
-    },
-    updateRoom(tab) {
-      this.$emit("currentRoom", tab);
     }
   }
 };
