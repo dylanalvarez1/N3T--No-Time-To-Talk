@@ -11,9 +11,14 @@
           <div class="md-subhead">choose the values below</div>
         </md-card-header>
         <md-card-content>
-          <md-field md-inline>
-            <label>Topic</label>
-            <md-input v-model="topic"></md-input>
+          <md-field>
+            <label for="topic">Topic</label>
+            <md-input
+              v-model="topic"
+              type="text"
+              name="topic"
+              aria-placeholder="Topic"
+            ></md-input>
           </md-field>
           <md-field>
             <label>Size</label>
@@ -36,22 +41,12 @@ export default {
     socket: {
       type: Object,
       default: null
-    },
-    room: {
-      type: String,
-      default: ""
     }
   },
   data() {
     return {
-      number: {
-        type: Number,
-        default: 2
-      },
-      topic: {
-        type: String,
-        default: ""
-      }
+      number: 2,
+      topic: ""
     };
   },
   methods: {
@@ -59,10 +54,9 @@ export default {
       this.$router.go(-1);
     },
     createRoom() {
-      this.socket.emit("SUBSCRIBE", {
-        topic: this.topic,
-        amount: this.number,
-        room: this.room
+      this.socket.emit("CREATE_CHAT", {
+        room: this.topic,
+        amount: this.number
       });
     }
   }

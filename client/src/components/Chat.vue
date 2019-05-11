@@ -1,30 +1,30 @@
 <template>
   <div>
-    <BoardSelection
-      :key="updater"
-      :socket="socket"
-      :boards="rooms"
-      @currentRoom="updateRoom"
-    />
+    <RoomSelect :key="updateTabs" :socket="socket" :rooms="rooms" />
     <div class="flexboxing">
       <router-view :user="user" :socket="socket" />
-      <HeadCount :socket="socket" :room="room" @leaveRoom="leaveRoom" />
+      <UserList
+        :key="updateList"
+        :socket="socket"
+        :users="users"
+        @leaveRoom="leaveRoom"
+      />
     </div>
-    <MessageInput :user="user" :socket="socket" :room="room" />
+    <TypeMessage :user="user" :socket="socket" />
   </div>
 </template>
 
 <script>
-import MessageInput from "@/components/MessageInput";
-import BoardSelection from "@/components/BoardSelection";
-import HeadCount from "@/components/HeadCount";
+import TypeMessage from "@/components/TypeMessage";
+import RoomSelect from "@/components/RoomSelect";
+import UserList from "@/components/UserList";
 import io from "socket.io-client";
 
 export default {
   components: {
-    BoardSelection,
-    MessageInput,
-    HeadCount
+    RoomSelect,
+    TypeMessage,
+    UserList
   },
   props: {
     user: {
@@ -34,40 +34,61 @@ export default {
   },
   data() {
     return {
-      showCreateBoard: false,
-      room: "global",
-      rooms: ["global", "games", "anime", "manga", "code"],
+      showCreateRoom: false,
+      rooms: ["global"],
       socket: io("localhost:3001"),
-      updater: 0
+      updateTabs: 0,
+      updateList: 0,
+      users: []
     };
   },
-  watch: {
-    $route: function(to) {
-      this.room = to.params.room;
-    }
-  },
   mounted() {
-    //Format the data so it can display correctly
-    this.rooms.forEach(room => {
+    this.joinRoom();
+
+    this.socket.on("LEAVE_CHAT", data => {
+      this.users = this.users.filter(
+        user => user.room != data.room || user.id != data.id
+      );
+    });
+
+    this.socket.on("REMOVE_USER", leavingUser => {
+      this.users = this.users.filter(user => user.id != leavingUser.id);
+    });
+
+    this.socket.on("GET_USERS_IN_ROOM", data => {
+      let { users, room } = data;
+      let removeResidual = this.users.filter(user => user.room != room);
+      this.users = [...removeResidual, ...users];
+      this.updateList += 1;
+    });
+
+    this.socket.on("CREATE_CHAT", data => {
+      this.rooms.push(data.room);
+      this.$router.push(`/room/${data.room}`);
+      this.joinRoom();
+      this.updateTabs += 1;
+      this.updateList += 1;
+    });
+  },
+  methods: {
+    leaveRoom() {
+      let room = this.$route.params.room;
+      this.socket.emit("LEAVE_CHAT", {
+        room: room,
+        id: this.socket.id,
+        user: this.user
+      });
+      this.rooms = this.rooms.filter(otherrooms => otherrooms != room);
+      this.updateTabs += 1;
+      this.$router.push("global");
+    },
+    joinRoom() {
       this.socket.emit("ENTER_CHAT", {
         user: this.user,
         message: `${this.user} has joined the chat!`,
         server: true,
-        room
+        room: this.$route.params.room
       });
-    });
-  },
-  methods: {
-    updateRoom(room) {
-      this.room = room;
-    },
-    leaveRoom() {
-      this.socket.emit("UNSUBSCRIBE", {
-        room: this.room
-      });
-      this.rooms = this.rooms.filter(room => room != this.room);
-      this.updater += 1;
-      this.$router.push("global");
     }
   }
 };

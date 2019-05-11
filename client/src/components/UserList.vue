@@ -2,14 +2,17 @@
   <div class="list">
     <md-content md-permanent="full">
       <md-toolbar class="md-transparent toolbar" md-elevation="0">
-        <p>{{ users.length }} in {{ $route.params.room }}.</p>
+        <p>
+          {{ filteredUsers.length }}
+          in {{ $route.params.room }}.
+        </p>
         <md-button class="md-raised leavebtn" @click="leaveRoom"
           >Leave</md-button
         >
       </md-toolbar>
 
       <span v-if="users != null">
-        <md-list v-for="(user, index) in users" :key="index">
+        <md-list v-for="(user, index) in filteredUsers" :key="index">
           <md-list-item>
             <span class="md-list-item-text">{{ `${user.name}` }}</span>
           </md-list-item>
@@ -26,24 +29,15 @@ export default {
       type: Object,
       default: null
     },
-    room: {
-      type: String,
-      default: ""
+    users: {
+      type: Array,
+      default: () => []
     }
   },
-  data() {
-    return {
-      users: []
-    };
-  },
-  mounted() {
-    this.socket.on("USERS", users => {
-      this.users = users;
-    });
-    this.socket.on("REMOVE_USER", leavingUser => {
-      this.users = this.users.filter(user => user.name != leavingUser);
-    });
-    //event when someone leaves the chat
+  computed: {
+    filteredUsers() {
+      return this.users.filter(user => user.room === this.$route.params.room);
+    }
   },
   methods: {
     leaveRoom() {
