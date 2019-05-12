@@ -1,7 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+let bodyparser = require('body-parser');
 const app = express();
 app.use(cors());
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({
+    extended: true
+}));
 
 server = app.listen(3001, function () {
     console.log('server is running on port 3001')
@@ -10,6 +15,17 @@ app.get('/', function (req, res, next) {
     res.send("hello world");
 });
 
+app.post('/login', function (req, res, next) {
+    let name = req.body.name;
+    if (name === undefined) {
+        res.status(501).send({ msg: "Please enter a name." })
+    } else if (users.filter(user => user.name === name).length > 0) {
+        res.status(501).send({ msg: "This name is not unique. Please choose another." })
+    } else {
+        res.status(200).send({});
+    }
+
+})
 
 
 const io = require('socket.io')(server);
@@ -58,16 +74,18 @@ io.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function (data) {
-        users = users.filter(user =>
+        let leavingusers = users.filter(user =>
             user.id == socket.id
         );
-        users.forEach(user => {
+        leavingusers.forEach(user => {
             io.sockets.in(user.room).emit('LEAVE_CHAT', user);
 
             // Update clients
             io.sockets.in(user.room).emit('REMOVE_USER', user);
 
         })
+
+        users = users.filter(user => user.id != socket.id);
 
     });
 });
