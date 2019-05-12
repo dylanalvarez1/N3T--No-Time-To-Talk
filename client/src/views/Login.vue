@@ -17,6 +17,10 @@
           </md-card-actions>
         </md-card-content>
       </md-card>
+      <md-snackbar md-position="center" :md-active.sync="error" md-persistent>
+        <span>{{ errmsg }}</span>
+        <md-button class="md-primary" @click="error = false">Close</md-button>
+      </md-snackbar>
     </form>
   </div>
 </template>
@@ -25,13 +29,36 @@
 export default {
   data() {
     return {
-      name: ""
+      name: "",
+      error: false,
+      errmsg: ""
     };
   },
   methods: {
-    loginUser(e) {
+    async loginUser(e) {
       e.preventDefault();
-      this.$emit("loginUser", this.name);
+      if (this.name === "") {
+        this.error = true;
+        this.errmsg = "Name cannot be empty.";
+
+        return;
+      }
+      let payload = { name: this.name };
+      let response = await fetch("http://localhost:3001/login", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.status !== 200) {
+        let content = await response.json();
+        this.errmsg = content.msg;
+        this.error = true;
+      } else {
+        this.$emit("loginUser", this.name);
+      }
     }
   }
 };
@@ -39,7 +66,7 @@ export default {
 <style>
 .card-container {
   margin-left: 35%;
-  margin-top: 10%;
+  margin-top: 15%;
   height: 40vh;
   padding: 10px;
 }

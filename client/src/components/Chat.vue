@@ -11,6 +11,10 @@
       />
     </div>
     <TypeMessage :user="user" :socket="socket" />
+    <md-snackbar md-position="center" :md-active.sync="err" md-persistent>
+      <span>{{ errmsg }}</span>
+      <md-button class="md-primary" @click="error = false">Close</md-button>
+    </md-snackbar>
   </div>
 </template>
 
@@ -39,7 +43,9 @@ export default {
       socket: io("localhost:3001"),
       updateTabs: 0,
       updateList: 0,
-      users: []
+      users: [],
+      err: false,
+      errmsg: ""
     };
   },
   mounted() {
@@ -73,14 +79,19 @@ export default {
   methods: {
     leaveRoom() {
       let room = this.$route.params.room;
-      this.socket.emit("LEAVE_CHAT", {
-        room: room,
-        id: this.socket.id,
-        user: this.user
-      });
-      this.rooms = this.rooms.filter(otherrooms => otherrooms != room);
-      this.updateTabs += 1;
-      this.$router.push("global");
+      if (room !== "global") {
+        this.socket.emit("LEAVE_CHAT", {
+          room: room,
+          id: this.socket.id,
+          user: this.user
+        });
+        this.rooms = this.rooms.filter(otherrooms => otherrooms != room);
+        this.updateTabs += 1;
+        this.$router.push("global");
+      } else {
+        this.err = true;
+        this.errmsg = "Can't leave Global.";
+      }
     },
     joinRoom() {
       this.socket.emit("ENTER_CHAT", {
