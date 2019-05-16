@@ -60,11 +60,33 @@ io.on('connection', function (socket) {
     });
 
     socket.on('CREATE_CHAT', function (data) {
-
         socket.emit('CREATE_CHAT', data);
-        // for searching later
-        // io.emit('UPDATE_SEARCH_LIST', data);
-    })
+    });
+
+    socket.on('JOIN_SPECIFIC_ROOM', function (room) {
+        socket.join(room);
+        // for searching, create a tab and switch routing of client
+        io.emit('CREATE_CHAT', {
+            room: room
+        });
+    });
+
+    socket.on('LIST_ROOMS', function (data) {
+        socket.emit('ROOM_LIST', io.sockets.adapter.rooms);
+        let idList = users.map(user => user.id)
+
+        //create a list of only rooms (socket treats rooms and users as both rooms)
+        //if there is an element not in idList, return it
+        let room_user_arr = Object.keys(io.sockets.adapter.rooms);
+        let room_arr = room_user_arr.filter(el => {
+            return !idList.includes(el);
+        });
+
+        socket.emit('MY_ROOMS', Object.keys(io.sockets.adapter.sids[socket.id]));
+        socket.emit('SENT_ROOM_LIST', room_arr);
+
+    });
+
     socket.on('TYPING', function (data) {
         io.sockets.in(data.room).emit('TYPING', data);
     });

@@ -30,6 +30,9 @@ export default {
 </script>
 
 <style>
+#id {
+  overflow: auto;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s ease;
