@@ -1,26 +1,15 @@
 {
-  "extends": [
-    "plugin:prettier/recommended",
-    "plugin:vue/recommended",
-    "prettier/vue",
-    "eslint:recommended"
-  ],
-  "plugins": [
-    "prettier",
-    "vue"
-  ],
-  "rules": {
-    "prettier/prettier": [
-      "error"
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "jsx": true,
+        "useJSXTextNode": true
+    },
+    "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "prettier",
+        "prettier/@typescript-eslint"
+    ],
+    "plugins": [
+        "@typescript-eslint"
     ]
-  },
-  "parserOptions": {
-    "parser": "babel-eslint",
-    "ecmaVersion": 8,
-    "sourceType": "module"
-  },
-  "env": {
-    "browser": true,
-    "node": true
-  }
 }
